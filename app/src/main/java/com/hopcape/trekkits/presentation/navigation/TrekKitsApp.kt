@@ -14,7 +14,7 @@ import com.hopcape.trekkits.auth.presentation.navigation.Auth
 import com.hopcape.trekkits.auth.presentation.navigation.authNavigation
 
 @Composable
-fun TrekKitsApp(modifier: Modifier = Modifier,navController: NavHostController = rememberNavController(),startDestination: Routes = Routes.HomeScreen) {
+fun TrekKitsApp(modifier: Modifier = Modifier,navController: NavHostController = rememberNavController(),startDestination: Auth = Auth) {
     NavHost(
         modifier = modifier,
         navController = navController,

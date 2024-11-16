@@ -1,6 +1,5 @@
 package com.hopcape.trekkits.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,15 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = ForestGreen,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    surfaceDim = MarianBlue
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+    primary = ForestGreen,
     secondary = PurpleGrey40,
-    tertiary = Pink40
+    tertiary = Pink40,
+    surfaceDim = MarianBlue
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -37,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 fun TrekKitsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

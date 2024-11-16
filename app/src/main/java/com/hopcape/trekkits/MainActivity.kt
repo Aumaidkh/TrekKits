@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.hopcape.trekkits.presentation.navigation.Routes
+import com.hopcape.trekkits.auth.presentation.navigation.Auth
 import com.hopcape.trekkits.presentation.navigation.TrekKitsApp
 import com.hopcape.trekkits.ui.theme.TrekKitsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize(),
                     navController = navHostController,
-                    startDestination = Routes.HomeScreen
+                    startDestination = Auth
                 )
             }
         }

@@ -1,10 +1,13 @@
 package com.hopcape.trekkits.auth.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
-class LoginScreenViewModel: ViewModel() {
+@HiltViewModel
+class LoginScreenViewModel @Inject constructor(): ViewModel() {
     private val _state = MutableStateFlow(LoginScreenState())
     val state = _state.asStateFlow()
 
@@ -27,6 +30,11 @@ class LoginScreenViewModel: ViewModel() {
             is LoginScreenAction.Login -> {
                 login()
             }
+
+            LoginScreenAction.ForgotPassword -> TODO()
+            LoginScreenAction.Register -> TODO()
+            LoginScreenAction.SignInWithFacebook -> TODO()
+            LoginScreenAction.SignInWithGoogle -> TODO()
         }
     }
 

@@ -24,3 +24,7 @@ fun DependencyHandlerScope.addNavigation(project: Project){
 fun DependencyHandlerScope.addAuthModule(){
     addProject("auth")
 }
+
+fun DependencyHandlerScope.addDesignSystemModule(){
+    addProject("designSystem")
+}

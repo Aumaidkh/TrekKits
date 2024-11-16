@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "Trek Kits"
 include(":app")
 include(":auth")
+include(":designSystem")
