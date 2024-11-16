@@ -2,7 +2,7 @@ package extensions
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.DependencyHandlerScope
-
+import org.gradle.kotlin.dsl.project
 
 
 fun DependencyHandlerScope.implementation(dependency: String,project: Project) {
@@ -19,4 +19,8 @@ fun DependencyHandlerScope.implementationPlatform(dependency: String,project: Pr
 
 fun DependencyHandlerScope.kapt(dependency: String, project: Project){
     add("kapt",project.versionCatalog().findLibrary(dependency).get())
+}
+
+fun DependencyHandlerScope.addProject(name: String){
+    add("implementation",project(":$name"))
 }

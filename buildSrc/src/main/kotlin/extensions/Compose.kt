@@ -20,3 +20,7 @@ fun DependencyHandlerScope.addCompose(project: Project){
 fun DependencyHandlerScope.addNavigation(project: Project){
     implementation("androidx-navigation-compose",project)
 }
+
+fun DependencyHandlerScope.addAuthModule(){
+    addProject("auth")
+}

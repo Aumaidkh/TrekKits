@@ -1,3 +1,4 @@
+import extensions.addAuthModule
 import extensions.addNavigation
 
 plugins {
@@ -42,6 +43,7 @@ android {
 
 dependencies {
     addNavigation(project)
+    addAuthModule()
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
