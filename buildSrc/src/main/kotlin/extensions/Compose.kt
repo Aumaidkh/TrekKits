@@ -16,3 +16,7 @@ fun DependencyHandlerScope.addCompose(project: Project){
 
     implementationPlatform("androidx-compose-bom",project)
 }
+
+fun DependencyHandlerScope.addNavigation(project: Project){
+    implementation("androidx-navigation-compose",project)
+}

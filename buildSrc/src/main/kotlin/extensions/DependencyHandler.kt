@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 
 
+
 fun DependencyHandlerScope.implementation(dependency: String,project: Project) {
     add("implementation",project.versionCatalog().findLibrary(dependency).get())
 }

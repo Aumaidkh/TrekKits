@@ -36,6 +36,11 @@ gradlePlugin{
             id="tt.application"
             implementationClass="plugins.AndroidApplicationPlugin"
         }
+
+        register("kotlinSerialization"){
+            id="tt.serialization"
+            implementationClass="plugins.KotlinSerialization"
+        }
     }
 }
 
