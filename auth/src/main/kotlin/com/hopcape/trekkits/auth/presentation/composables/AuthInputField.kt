@@ -17,6 +17,7 @@ fun AuthInputField(
     value: String,
     onValueChange: (String) -> Unit,
     startIconResId: Int,
+    error: String? = null,
     trailingContent: @Composable (() -> Unit) = { },
 ) {
     InputField(
@@ -38,6 +39,7 @@ fun AuthInputField(
         },
         trailingIcon = {
             trailingContent.invoke()
-        }
+        },
+        error = error
     )
 }

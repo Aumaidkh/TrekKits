@@ -16,6 +16,7 @@ import com.hopcape.designsystem.styles.buttonLarge
 fun PrimaryButton(
     modifier: Modifier = Modifier,
     text: String = "Login",
+    enabled: Boolean = true,
     onClick: () -> Unit = {},
 ) {
     Button(
@@ -25,8 +26,10 @@ fun PrimaryButton(
         shape = MaterialTheme.shapes.large,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+        ),
+        enabled = enabled
     ){
         Text(
             text = text,

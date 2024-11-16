@@ -23,3 +23,4 @@ rootProject.name = "Trek Kits"
 include(":app")
 include(":auth")
 include(":designSystem")
+include(":common")

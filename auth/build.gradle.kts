@@ -1,3 +1,4 @@
+import extensions.addCommonModule
 import extensions.addDesignSystemModule
 
 plugins {
@@ -14,5 +15,6 @@ android {
 
 dependencies {
     addDesignSystemModule()
+    addCommonModule()
     implementation(libs.androidx.navigation.compose)
 }

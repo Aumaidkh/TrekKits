@@ -17,6 +17,7 @@ fun InputField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    error: String? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
@@ -31,12 +32,19 @@ fun InputField(
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         singleLine = true,
+        isError = error != null,
+        supportingText = {
+            if (error != null) {
+                Text(text = error, style = hintSmall.copy(color = MaterialTheme.colorScheme.error))
+            }
+        },
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
             disabledContainerColor = Color.Transparent,
             focusedIndicatorColor = MaterialTheme.colorScheme.primary,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
+            errorContainerColor = Color.Transparent
         )
     )
 }

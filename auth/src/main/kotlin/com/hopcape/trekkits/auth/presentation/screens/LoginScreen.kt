@@ -9,9 +9,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.hopcape.designsystem.components.buttons.PrimaryButton
 import com.hopcape.designsystem.components.buttons.TextWithClickableText
 import com.hopcape.designsystem.styles.bodyLowEmphasis
+import com.hopcape.trekkits.auth.presentation.composables.AuthButton
 import com.hopcape.trekkits.auth.presentation.composables.AuthInputField
 import com.hopcape.trekkits.auth.presentation.composables.AuthScreen
 import com.hopcape.trekkits.auth.presentation.viewmodel.LoginScreenAction
@@ -45,7 +45,8 @@ internal fun LoginScreen(
             text = "Email",
             value = screenState.formState.email,
             onValueChange = { onAction(LoginScreenAction.EmailChanged(it)) },
-            startIconResId = com.hopcape.designsystem.R.drawable.envelope
+            startIconResId = com.hopcape.designsystem.R.drawable.envelope,
+            error = screenState.formState.emailError
         )
 
         AuthInputField(
@@ -59,6 +60,7 @@ internal fun LoginScreen(
             value = screenState.formState.password,
             onValueChange = { onAction(LoginScreenAction.PasswordChanged(it)) },
             startIconResId = com.hopcape.designsystem.R.drawable.key,
+            error = screenState.formState.passwordError,
             trailingContent = {
                 TextButton(
                     modifier = Modifier
@@ -70,11 +72,11 @@ internal fun LoginScreen(
             }
         )
 
-        PrimaryButton(
+        AuthButton(
             modifier = Modifier
                 .fillMaxWidth(),
-            text = "Login",
-            onClick = { onAction(LoginScreenAction.Login)}
+            state = screenState.displayState,
+            onAction = onAction
         )
 
         Text(

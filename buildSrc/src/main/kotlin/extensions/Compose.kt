@@ -28,3 +28,7 @@ fun DependencyHandlerScope.addAuthModule(){
 fun DependencyHandlerScope.addDesignSystemModule(){
     addProject("designSystem")
 }
+
+fun DependencyHandlerScope.addCommonModule(){
+    addProject("common")
+}
