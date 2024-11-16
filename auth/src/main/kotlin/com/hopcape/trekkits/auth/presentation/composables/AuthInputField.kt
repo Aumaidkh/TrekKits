@@ -7,6 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import com.hopcape.designsystem.components.fields.InputField
 import com.hopcape.designsystem.dimens.inputFieldStartIconDrawable
 
@@ -18,6 +21,9 @@ fun AuthInputField(
     onValueChange: (String) -> Unit,
     startIconResId: Int,
     error: String? = null,
+    imeAction: ImeAction = ImeAction.Next,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingContent: @Composable (() -> Unit) = { },
 ) {
     InputField(
@@ -40,6 +46,9 @@ fun AuthInputField(
         trailingIcon = {
             trailingContent.invoke()
         },
-        error = error
+        error = error,
+        visualTransformation = visualTransformation,
+        keyboardType = keyboardType,
+        imeAction = imeAction
     )
 }

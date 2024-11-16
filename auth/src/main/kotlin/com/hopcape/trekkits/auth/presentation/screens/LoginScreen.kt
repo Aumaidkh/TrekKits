@@ -8,6 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hopcape.designsystem.components.buttons.TextWithClickableText
 import com.hopcape.designsystem.styles.bodyLowEmphasis
@@ -46,7 +49,9 @@ internal fun LoginScreen(
             value = screenState.formState.email,
             onValueChange = { onAction(LoginScreenAction.EmailChanged(it)) },
             startIconResId = com.hopcape.designsystem.R.drawable.envelope,
-            error = screenState.formState.emailError
+            error = screenState.formState.emailError,
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Email
         )
 
         AuthInputField(
@@ -69,7 +74,10 @@ internal fun LoginScreen(
                 ) {
                     Text("Forgot Password?")
                 }
-            }
+            },
+            visualTransformation = PasswordVisualTransformation(),
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password
         )
 
         AuthButton(
