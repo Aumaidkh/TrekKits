@@ -12,10 +12,16 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,8 +34,9 @@ import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScree
 import com.hopcape.trekkits.auth.presentation.screens.register.RegisterScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenViewModel
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenViewModel
+import kotlinx.coroutines.launch
 
-fun NavGraphBuilder.authNavigation(
+@OptIn(ExperimentalMaterial3Api::class) fun NavGraphBuilder.authNavigation(
     navController: NavHostController,
 ){
     navigation<Auth>( startDestination = Login ){
@@ -41,20 +48,33 @@ fun NavGraphBuilder.authNavigation(
                 ) + fadeOut(animationSpec = tween(durationMillis = 500))
             }
         ) {
-            val scrollState = rememberScrollState()
             val viewModel = hiltViewModel<LoginScreenViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
             val event by viewModel.events.collectAsStateWithLifecycle(null)
+
+            val scrollState = rememberScrollState()
+            val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+                bottomSheetState = SheetState(
+                    skipPartiallyExpanded = false,
+                    density = LocalDensity.current,
+                    initialValue = SheetValue.Hidden
+                )
+            )
+
             LaunchedEffect(event){
                 when(event){
                     LoginScreenEvents.NavigateToRegister -> navController.navigate(Register)
+                    is LoginScreenEvents.ShowBottomSheet -> {
+                        bottomSheetScaffoldState.bottomSheetState.expand()
+                    }
                     else -> Unit
                 }
             }
             LoginScreen(
                 scrollState = scrollState,
+                bottomSheetScaffoldState = bottomSheetScaffoldState,
                 screenState = state,
-                onAction = viewModel::onAction
+                onAction = viewModel::onAction,
             )
         }
 

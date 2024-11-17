@@ -12,6 +12,7 @@ enum class AuthError: DomainError {
     EMPTY_NAME,
     NAME_CONTAINS_DIGIT,
     INVALID_NAME,
-    PASSWORDS_DONT_MATCH
+    PASSWORDS_DONT_MATCH,
+    EMAIL_NOT_VERIFIED
 }
 

@@ -4,6 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hopcape.designsystem.fonts.Poppins
 
@@ -18,6 +19,18 @@ get() =
         fontSize = 32.sp,
         fontWeight = FontWeight.SemiBold
     )
+
+val headingMedium: TextStyle
+    @Composable
+    get() =
+        MaterialTheme.typography.headlineLarge.copy(
+            color = MaterialTheme.colorScheme.onBackground.copy(
+                alpha = 0.8f
+            ),
+            fontFamily = Poppins,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.SemiBold
+        )
 
 
 val hintSmall: TextStyle @Composable
@@ -39,6 +52,19 @@ get() =  MaterialTheme.typography.bodyMedium.copy(
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium
     )
+
+val bodyMediumEmphasis: TextStyle
+    @Composable
+    get() = MaterialTheme.typography.bodyMedium.copy(
+        color = MaterialTheme.colorScheme.onBackground.copy(
+            alpha = 0.7f
+        ),
+        fontFamily = Poppins,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+        lineHeight = 18.sp
+    )
+
 
 val buttonLarge: TextStyle
     @Composable

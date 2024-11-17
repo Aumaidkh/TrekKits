@@ -4,3 +4,4 @@ import androidx.compose.ui.unit.dp
 
 val ScreenHorizontalPadding = 32.dp
 val ScreenVerticalPadding = 32.dp
+val ContentInnerPadding = 32.dp

@@ -4,8 +4,13 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -14,22 +19,27 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hopcape.designsystem.components.buttons.TextWithClickableText
 import com.hopcape.designsystem.styles.bodyLowEmphasis
+import com.hopcape.trekkits.auth.presentation.SheetContent
 import com.hopcape.trekkits.auth.presentation.composables.AuthButton
 import com.hopcape.trekkits.auth.presentation.composables.AuthInputField
 import com.hopcape.trekkits.auth.presentation.composables.AuthScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenAction
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun LoginScreen(
     modifier: Modifier = Modifier,
     scrollState: ScrollState,
+    bottomSheetScaffoldState: BottomSheetScaffoldState,
+    sheetContent: SheetContent = SheetContent(),
     screenState: LoginScreenState = LoginScreenState(),
     onAction: (LoginScreenAction) -> Unit
 ) {
     AuthScreen(
         modifier = modifier,
         scrollState = scrollState,
+        bottomSheetScaffoldState = bottomSheetScaffoldState,
         onSignInWithGoogleClick = { onAction(LoginScreenAction.SignInWithGoogle) },
         onSignInWithFacebookClick = { onAction(LoginScreenAction.SignInWithFacebook) },
         textWithClickableText = {
@@ -40,7 +50,8 @@ internal fun LoginScreen(
                 clickableText = "Register",
                 onClick = { onAction(LoginScreenAction.Register) }
             )
-        }
+        },
+        sheetContent = sheetContent
     ){
         AuthInputField(
             modifier = Modifier
