@@ -1,4 +1,4 @@
-package com.hopcape.trekkits.auth.presentation.screens
+package com.hopcape.trekkits.auth.presentation.screens.login
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +17,8 @@ import com.hopcape.designsystem.styles.bodyLowEmphasis
 import com.hopcape.trekkits.auth.presentation.composables.AuthButton
 import com.hopcape.trekkits.auth.presentation.composables.AuthInputField
 import com.hopcape.trekkits.auth.presentation.composables.AuthScreen
-import com.hopcape.trekkits.auth.presentation.viewmodel.LoginScreenAction
-import com.hopcape.trekkits.auth.presentation.viewmodel.LoginScreenState
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenAction
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenState
 
 @Composable
 internal fun LoginScreen(

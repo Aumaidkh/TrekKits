@@ -1,4 +1,4 @@
-package com.hopcape.trekkits.auth.presentation.viewmodel
+package com.hopcape.trekkits.auth.presentation.screens.login.viewmodel
 
 sealed interface LoginScreenAction {
     data class EmailChanged(val email: String) : LoginScreenAction

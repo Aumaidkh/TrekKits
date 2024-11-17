@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.hopcape.designsystem.components.buttons.PrimaryButton
-import com.hopcape.trekkits.auth.presentation.viewmodel.DisplayState
-import com.hopcape.trekkits.auth.presentation.viewmodel.LoginScreenAction
-import com.hopcape.trekkits.auth.presentation.viewmodel.LoginScreenState
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.DisplayState
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenAction
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenState
 
 @Composable
 fun AuthButton(

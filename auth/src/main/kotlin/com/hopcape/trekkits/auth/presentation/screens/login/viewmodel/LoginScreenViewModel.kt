@@ -1,4 +1,4 @@
-package com.hopcape.trekkits.auth.presentation.viewmodel
+package com.hopcape.trekkits.auth.presentation.screens.login.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,11 +6,14 @@ import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.domain.errors.AuthError
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,6 +22,9 @@ class LoginScreenViewModel @Inject constructor(
 ): ViewModel() {
     private val _state = MutableStateFlow(LoginScreenState())
     val state = _state.asStateFlow()
+
+    private val _events = Channel<LoginScreenEvents>()
+    val events = _events.receiveAsFlow()
 
     fun onAction(action: LoginScreenAction) {
         when (action) {
@@ -41,7 +47,7 @@ class LoginScreenViewModel @Inject constructor(
             }
 
             LoginScreenAction.ForgotPassword -> TODO()
-            LoginScreenAction.Register -> TODO()
+            LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
             LoginScreenAction.SignInWithFacebook -> TODO()
             LoginScreenAction.SignInWithGoogle -> TODO()
         }
@@ -64,6 +70,12 @@ class LoginScreenViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun sendEvent(event: LoginScreenEvents){
+        viewModelScope.launch {
+            _events.send(event)
+        }
     }
 
     private fun handleError(error: AuthError){
