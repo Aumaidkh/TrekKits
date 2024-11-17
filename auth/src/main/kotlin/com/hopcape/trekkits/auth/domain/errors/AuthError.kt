@@ -9,5 +9,9 @@ enum class AuthError: DomainError {
     EMPTY_EMAIL,
     EMPTY_PASSWORD,
     INVALID_CREDENTIALS,
+    EMPTY_NAME,
+    NAME_CONTAINS_DIGIT,
+    INVALID_NAME,
+    PASSWORDS_DONT_MATCH
 }
 

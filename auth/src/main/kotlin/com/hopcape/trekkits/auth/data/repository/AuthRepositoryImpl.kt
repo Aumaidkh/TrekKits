@@ -15,4 +15,9 @@ internal class AuthRepositoryImpl @Inject constructor(): AuthRepository {
         delay(4000)
         return Result.Success(User())
     }
+
+    override suspend fun register(user: User,password: String): Result<User, AuthError> {
+        delay(4000)
+        return Result.Success(User())
+    }
 }

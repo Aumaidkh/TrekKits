@@ -86,6 +86,7 @@ class LoginScreenViewModel @Inject constructor(
             AuthError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
             AuthError.EMPTY_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) } }
             AuthError.INVALID_CREDENTIALS -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) } }
+            else -> Unit
         }
     }
 }

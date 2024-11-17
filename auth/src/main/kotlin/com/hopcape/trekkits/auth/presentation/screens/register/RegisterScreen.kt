@@ -91,7 +91,7 @@ internal fun RegisterScreen(
                 modifier = modifier
                     .fillMaxWidth(),
                 text = if (screenState.displayState == RegisterScreenState.DisplayState.Loading) "Registering..." else "Register",
-                onClick = { onAction(RegisterScreenAction.Login)},
+                onClick = { onAction(RegisterScreenAction.Register)},
                 enabled = screenState.displayState != RegisterScreenState.DisplayState.Loading
             )
 

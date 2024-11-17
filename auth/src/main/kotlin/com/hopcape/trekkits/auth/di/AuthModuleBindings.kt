@@ -3,7 +3,9 @@ package com.hopcape.trekkits.auth.di
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
 import com.hopcape.trekkits.auth.data.repository.AuthRepositoryImpl
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
+import com.hopcape.trekkits.auth.domain.usecase.RegisterUseCase
 import com.hopcape.trekkits.auth.domain.validation.EmailValidator
+import com.hopcape.trekkits.auth.domain.validation.FullNameValidator
 import com.hopcape.trekkits.auth.domain.validation.PasswordValidator
 import dagger.Binds
 import dagger.Module
@@ -33,6 +35,21 @@ abstract class AuthModuleBindings{
         }
 
         @Provides
+        internal fun providesRegisterUseCase(
+            emailValidator: EmailValidator,
+            fullNameValidator: FullNameValidator,
+            passwordValidator: PasswordValidator,
+            repository: AuthRepository
+        ): RegisterUseCase {
+            return RegisterUseCase(
+                emailValidator = emailValidator,
+                passwordValidator = passwordValidator,
+                fullNameValidator = fullNameValidator,
+                authRepository = repository
+            )
+        }
+
+        @Provides
         internal fun providesEmailValidatorUseCase(): EmailValidator {
             return EmailValidator()
         }
@@ -40,6 +57,11 @@ abstract class AuthModuleBindings{
         @Provides
         internal fun providesPasswordValidatorUseCase(): PasswordValidator {
             return PasswordValidator()
+        }
+
+        @Provides
+        internal fun providesFullNameValidatorUseCase(): FullNameValidator {
+            return FullNameValidator()
         }
 
     }
