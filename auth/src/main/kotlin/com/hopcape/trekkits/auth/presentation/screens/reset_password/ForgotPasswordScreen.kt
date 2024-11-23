@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.hopcape.auth.R
 import com.hopcape.designsystem.styles.bodyLowEmphasis
 import com.hopcape.trekkits.auth.presentation.composables.AuthInputField
 import com.hopcape.trekkits.auth.presentation.composables.AuthScreen
@@ -34,6 +35,7 @@ fun ForgotPasswordScreen(
         screenTitle = "Forgot Password",
         onSignInWithGoogleClick = {},
         onSignInWithFacebookClick = {},
+        illustrationResId = R.drawable.forgot_password_illustration,
         textWithClickableText = {},
         sheetContent = (state.displayState as? DisplayState.Success)?.sheetContent,
         bottomSheetScaffoldState = bottomSheetScaffoldState,
