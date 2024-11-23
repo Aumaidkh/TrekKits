@@ -1,6 +1,7 @@
 [versions]
 agp = "8.7.2"
 hiltVersion = "2.51"
+firebaseBom = "33.6.0"
 javapoet = "1.13.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -18,6 +19,7 @@ navigationCompose = "2.8.4"
 kotlinGradlePlugin = "1.9.0"
 hiltNavigationVersion = "1.2.0"
 
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -34,6 +36,10 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+## Firebase
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom"}
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 
 ## Hilt
 hilt-android-gradle-plugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hiltVersion" }

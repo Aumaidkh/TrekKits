@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059617624483",
+    "project_id": "trekkits-2a8c7",
+    "storage_bucket": "trekkits-2a8c7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059617624483:android:dd37c14c45bd01d489ca16",
+        "android_client_info": {
+          "package_name": "com.hopcape.trekkits"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASKTLnzpY6vNNv3A1Q7z0WfudoGpD7odM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,6 +17,11 @@ fun DependencyHandlerScope.addCompose(project: Project){
     implementationPlatform("androidx-compose-bom",project)
 }
 
+fun DependencyHandlerScope.addFirebase(project: Project){
+    implementationPlatform("firebase-bom",project)
+    implementation("firebase-auth",project)
+}
+
 fun DependencyHandlerScope.addNavigation(project: Project){
     implementation("androidx-navigation-compose",project)
 }

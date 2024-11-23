@@ -1,5 +1,6 @@
 import extensions.addCommonModule
 import extensions.addDesignSystemModule
+import extensions.addFirebase
 
 plugins {
     id("tt.android.library")
@@ -14,6 +15,7 @@ android {
 }
 
 dependencies {
+    addFirebase(project)
     addDesignSystemModule()
     addCommonModule()
     implementation(libs.androidx.navigation.compose)
