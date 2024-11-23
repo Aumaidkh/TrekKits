@@ -2,6 +2,7 @@ package com.hopcape.trekkits.auth.di
 
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
 import com.hopcape.trekkits.auth.data.repository.AuthRepositoryImpl
+import com.hopcape.trekkits.auth.domain.usecase.ForgotPasswordUseCase
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
 import com.hopcape.trekkits.auth.domain.usecase.RegisterUseCase
 import com.hopcape.trekkits.auth.domain.validation.EmailValidator
@@ -46,6 +47,17 @@ abstract class AuthModuleBindings{
                 passwordValidator = passwordValidator,
                 fullNameValidator = fullNameValidator,
                 authRepository = repository
+            )
+        }
+
+        @Provides
+        internal fun providesForgotPasswordUseCase(
+            emailValidator: EmailValidator,
+            repository: AuthRepository
+        ): ForgotPasswordUseCase {
+            return ForgotPasswordUseCase(
+                emailValidator = emailValidator,
+                repository = repository
             )
         }
 

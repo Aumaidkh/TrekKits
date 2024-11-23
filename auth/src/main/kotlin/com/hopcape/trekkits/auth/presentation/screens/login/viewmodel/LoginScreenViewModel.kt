@@ -6,6 +6,7 @@ import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.domain.errors.AuthError
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
 import com.hopcape.trekkits.auth.presentation.SheetContent
+import com.hopcape.trekkits.auth.presentation.navigation.Register
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +48,7 @@ class LoginScreenViewModel @Inject constructor(
                 login()
             }
 
-            LoginScreenAction.ForgotPassword -> TODO()
+            LoginScreenAction.ForgotPassword -> sendEvent(LoginScreenEvents.NavigateToForgotPassword)
             LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
             LoginScreenAction.SignInWithFacebook -> TODO()
             LoginScreenAction.SignInWithGoogle -> TODO()

@@ -18,6 +18,7 @@ import com.hopcape.trekkits.auth.presentation.SheetContent
 @Composable
 fun AuthBottomSheet(
     modifier: Modifier = Modifier,
+    onButtonClick: () -> Unit = {},
     sheetContent: SheetContent = SheetContent()
 ) {
     Column(
@@ -39,7 +40,8 @@ fun AuthBottomSheet(
             modifier = Modifier
                 .padding(top = 24.dp)
                 .fillMaxWidth(),
-            text = sheetContent.button
+            text = sheetContent.button,
+            onClick = onButtonClick
         )
     }
 }

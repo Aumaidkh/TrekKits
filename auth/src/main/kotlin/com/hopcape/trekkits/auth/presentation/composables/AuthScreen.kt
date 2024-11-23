@@ -37,8 +37,9 @@ internal fun AuthScreen(
     onSignInWithGoogleClick: () -> Unit,
     onSignInWithFacebookClick: () -> Unit,
     illustrationHeight: Dp = 400.dp,
-    sheetContent: SheetContent = SheetContent(),
+    sheetContent: SheetContent? = null,
     bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(),
+    onBottomSheetButtonClick: () -> Unit = {},
     textWithClickableText: @Composable () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -46,9 +47,12 @@ internal fun AuthScreen(
         modifier = modifier,
         scaffoldState = bottomSheetScaffoldState,
         sheetContent = {
-            AuthBottomSheet(
-                sheetContent = sheetContent
-            )
+            sheetContent?.let {
+                AuthBottomSheet(
+                    sheetContent = it,
+                    onButtonClick = onBottomSheetButtonClick
+                )
+            }
         },
         sheetPeekHeight = 10.dp,
         content = {

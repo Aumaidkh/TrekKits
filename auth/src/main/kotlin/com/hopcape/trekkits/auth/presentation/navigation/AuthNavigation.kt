@@ -34,7 +34,10 @@ import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScree
 import com.hopcape.trekkits.auth.presentation.screens.register.RegisterScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenViewModel
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenViewModel
-import kotlinx.coroutines.launch
+import com.hopcape.trekkits.auth.presentation.screens.reset_password.ForgotPasswordScreen
+import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.DisplayState
+import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.ForgotPasswordScreenEvent
+import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.ForgotPasswordScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class) fun NavGraphBuilder.authNavigation(
     navController: NavHostController,
@@ -63,7 +66,8 @@ import kotlinx.coroutines.launch
 
             LaunchedEffect(event){
                 when(event){
-                    LoginScreenEvents.NavigateToRegister -> navController.navigate(Register)
+                    is LoginScreenEvents.NavigateToRegister -> navController.navigate(Register)
+                    is LoginScreenEvents.NavigateToForgotPassword -> navController.navigate(ForgotPassword)
                     is LoginScreenEvents.ShowBottomSheet -> {
                         bottomSheetScaffoldState.bottomSheetState.expand()
                     }
@@ -105,7 +109,42 @@ import kotlinx.coroutines.launch
         }
 
         composable<ForgotPassword> {
+            val viewModel = hiltViewModel<ForgotPasswordScreenViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val event by viewModel.event.collectAsStateWithLifecycle(null)
+            val scrollState = rememberScrollState()
+            val bottomSheetState = rememberBottomSheetScaffoldState(
+                bottomSheetState = SheetState(
+                    skipPartiallyExpanded = false,
+                    density = LocalDensity.current,
+                    initialValue = SheetValue.Hidden
+                )
+            )
+            LaunchedEffect(event){
+                when(event){
+                    is ForgotPasswordScreenEvent.NavigateToLogin -> navController.navigate(Login)
+                    is ForgotPasswordScreenEvent.DismissBottomSheet -> bottomSheetState.bottomSheetState.hide()
+                    else -> Unit
+                }
+            }
 
+            LaunchedEffect(state.displayState){
+                when(state.displayState){
+                    is DisplayState.Success -> {
+                        bottomSheetState.bottomSheetState.expand()
+                    }
+                    else -> Unit
+                }
+            }
+
+            ForgotPasswordScreen(
+                modifier = Modifier
+                    .fillMaxSize(),
+                scrollState = scrollState,
+                state = state,
+                onAction = viewModel::onAction,
+                bottomSheetScaffoldState = bottomSheetState
+            )
         }
     }
 }

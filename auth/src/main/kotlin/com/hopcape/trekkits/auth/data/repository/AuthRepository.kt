@@ -7,4 +7,5 @@ import com.hopcape.trekkits.auth.domain.models.User
 interface AuthRepository {
     suspend fun login(email: String, password: String): Result<User,AuthError>
     suspend fun register(user: User,password: String): Result<User,AuthError>
+    suspend fun forgotPassword(email: String): Result<Unit,AuthError>
 }

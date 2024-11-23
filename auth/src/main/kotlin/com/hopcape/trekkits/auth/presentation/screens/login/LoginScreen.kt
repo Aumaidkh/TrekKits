@@ -79,8 +79,7 @@ internal fun LoginScreen(
             error = screenState.formState.passwordError,
             trailingContent = {
                 TextButton(
-                    modifier = Modifier
-                        .size(24.dp),
+                    modifier = Modifier,
                     onClick = { onAction(LoginScreenAction.ForgotPassword) }
                 ) {
                     Text("Forgot Password?")

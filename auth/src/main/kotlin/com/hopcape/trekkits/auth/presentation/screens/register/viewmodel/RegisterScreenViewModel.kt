@@ -80,6 +80,7 @@ class RegisterScreenViewModel @Inject constructor(
             AuthError.EMPTY_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be empty")) } }
             AuthError.NAME_CONTAINS_DIGIT -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name can't contain a digit")) } }
             AuthError.INVALID_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) } }
+            else -> {}
         }
     }
 }
