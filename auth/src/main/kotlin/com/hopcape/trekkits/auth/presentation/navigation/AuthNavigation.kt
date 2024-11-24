@@ -162,8 +162,12 @@ import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.F
             )
             LaunchedEffect(event){
                 when(event){
-                    is ForgotPasswordScreenEvent.NavigateToLogin -> navController.navigate(Login)
-                    is ForgotPasswordScreenEvent.DismissBottomSheet -> bottomSheetState.bottomSheetState.hide()
+                    is ForgotPasswordScreenEvent.NavigateToLogin -> {
+                        if (bottomSheetState.bottomSheetState.hasExpandedState) {
+                            bottomSheetState.bottomSheetState.hide()
+                        }
+                        navController.popBackStack()
+                    }
                     else -> Unit
                 }
             }

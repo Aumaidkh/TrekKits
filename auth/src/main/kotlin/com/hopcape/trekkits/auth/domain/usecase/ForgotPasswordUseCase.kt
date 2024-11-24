@@ -1,5 +1,6 @@
 package com.hopcape.trekkits.auth.domain.usecase
 
+import com.hopcape.common.domain.wrappers.Result
 import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
 import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
@@ -21,8 +22,10 @@ class ForgotPasswordUseCase @Inject constructor(
             if (!emailValidationResult.isValid && emailValidationResult.error != null){
                 return@flow emit(UseCaseResult.Error(emailValidationResult.error))
             }
-            val result = repository.forgotPassword(email)
-            emit(UseCaseResult.Success<Unit,AuthDomainError>(Unit))
+            when(val result = repository.forgotPassword(email)){
+                is Result.Error -> emit(UseCaseResult.Error(result.error))
+                is Result.Success -> emit(UseCaseResult.Success<Unit,AuthDomainError>(Unit))
+            }
         }.catch { emit(UseCaseResult.Error(AuthDomainError.SOMETHING_WENT_WRONG)) }
     }
 

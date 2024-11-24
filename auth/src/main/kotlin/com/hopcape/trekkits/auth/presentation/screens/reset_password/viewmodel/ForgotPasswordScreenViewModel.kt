@@ -58,7 +58,7 @@ internal class ForgotPasswordScreenViewModel @Inject constructor(
     }
 
     private fun handleBottomSheetButtonClick() {
-        pushEvent(ForgotPasswordScreenEvent.DismissBottomSheet)
+        pushEvent(ForgotPasswordScreenEvent.NavigateToLogin)
     }
 
     private fun forgotPassword(email: String) {
