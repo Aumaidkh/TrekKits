@@ -4,10 +4,9 @@ package com.hopcape.trekkits.auth.presentation.screens.register.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthError
+import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.models.User
 import com.hopcape.trekkits.auth.domain.usecase.RegisterUseCase
-import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.DisplayState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -68,18 +67,18 @@ class RegisterScreenViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun handleError(error: AuthError){
+    private fun handleError(error: AuthDomainError){
         when(error){
-            AuthError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = RegisterScreenState.DisplayState.Error(message = "Something went wrong")) } }
-            AuthError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
-            AuthError.INVALID_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) } }
-            AuthError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
-            AuthError.EMPTY_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) } }
-            AuthError.INVALID_CREDENTIALS -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) } }
-            AuthError.PASSWORDS_DONT_MATCH -> { _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Passwords don't match")) } }
-            AuthError.EMPTY_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be empty")) } }
-            AuthError.NAME_CONTAINS_DIGIT -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name can't contain a digit")) } }
-            AuthError.INVALID_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) } }
+            AuthDomainError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = RegisterScreenState.DisplayState.Error(message = "Something went wrong")) } }
+            AuthDomainError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
+            AuthDomainError.INVALID_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) } }
+            AuthDomainError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
+            AuthDomainError.EMPTY_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) } }
+            AuthDomainError.INVALID_CREDENTIALS -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) } }
+            AuthDomainError.PASSWORDS_DONT_MATCH -> { _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Passwords don't match")) } }
+            AuthDomainError.EMPTY_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be empty")) } }
+            AuthDomainError.NAME_CONTAINS_DIGIT -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name can't contain a digit")) } }
+            AuthDomainError.INVALID_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) } }
             else -> {}
         }
     }

@@ -1,8 +1,9 @@
 package com.hopcape.trekkits.auth.domain.usecase
 
+import com.hopcape.common.domain.wrappers.Result
 import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
-import com.hopcape.trekkits.auth.domain.errors.AuthError
+import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.validation.EmailValidator
 import com.hopcape.trekkits.auth.domain.validation.PasswordValidator
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ class LoginUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
 
-    operator fun invoke(email: String, password: String): Flow<UseCaseResult<Unit, AuthError>> {
+    operator fun invoke(email: String, password: String): Flow<UseCaseResult<Unit, AuthDomainError>> {
         return flow {
             emit(UseCaseResult.Loading())
             val emailResult = emailValidator(email)
@@ -27,9 +28,11 @@ class LoginUseCase @Inject constructor(
             if (!passwordResult.isValid && passwordResult.error != null) {
                 emit(UseCaseResult.Error(passwordResult.error))
             }
-            val result = repository.login(email, password)
-            emit(UseCaseResult.Success<Unit,AuthError>(Unit))
-        }.catch { emit(UseCaseResult.Error(AuthError.SOMETHING_WENT_WRONG)) }
+            when(val result = repository.login(email, password)){
+                is Result.Error -> emit(UseCaseResult.Error<Unit, AuthDomainError>(result.error))
+                is Result.Success -> emit(UseCaseResult.Success(Unit))
+            }
+        }.catch { emit(UseCaseResult.Error(AuthDomainError.SOMETHING_WENT_WRONG)) }
     }
 
 }

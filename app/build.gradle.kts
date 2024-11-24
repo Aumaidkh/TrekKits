@@ -1,4 +1,5 @@
 import extensions.addAuthModule
+import extensions.addFirebase
 import extensions.addNavigation
 
 plugins {
@@ -7,6 +8,7 @@ plugins {
     id("tt.hilt")
     id("tt.compose.app")
     id("tt.serialization")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -44,6 +46,7 @@ android {
 dependencies {
     addNavigation(project)
     addAuthModule()
+    addFirebase(project)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -60,4 +63,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.junit)
+
+
 }

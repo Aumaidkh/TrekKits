@@ -3,7 +3,7 @@ package com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthError
+import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.usecase.ForgotPasswordUseCase
 import com.hopcape.trekkits.auth.presentation.SheetContent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -87,11 +87,11 @@ internal class ForgotPasswordScreenViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun handleError(error: AuthError){
+    private fun handleError(error: AuthDomainError){
         when(error){
-            AuthError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) } }
-            AuthError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
-            AuthError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
+            AuthDomainError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) } }
+            AuthDomainError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
+            AuthDomainError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
             else -> Unit
         }
         _state.update { it.copy(displayState = DisplayState.Initial) }

@@ -2,7 +2,7 @@ package com.hopcape.trekkits.auth.domain.errors
 
 import com.hopcape.common.domain.error.DomainError
 
-enum class AuthError: DomainError {
+enum class AuthDomainError: DomainError {
     SOMETHING_WENT_WRONG,
     INVALID_EMAIL,
     INVALID_PASSWORD,
@@ -15,4 +15,6 @@ enum class AuthError: DomainError {
     PASSWORDS_DONT_MATCH,
     EMAIL_NOT_VERIFIED
 }
+
+
 

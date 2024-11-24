@@ -3,10 +3,9 @@ package com.hopcape.trekkits.auth.presentation.screens.login.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthError
+import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
 import com.hopcape.trekkits.auth.presentation.SheetContent
-import com.hopcape.trekkits.auth.presentation.navigation.Register
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,16 +79,45 @@ class LoginScreenViewModel @Inject constructor(
         }
     }
 
-    private fun handleError(error: AuthError){
+    private fun handleError(error: AuthDomainError) {
         when(error){
-            AuthError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) } }
-            AuthError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
-            AuthError.INVALID_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) } }
-            AuthError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
-            AuthError.EMPTY_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) } }
-            AuthError.INVALID_CREDENTIALS -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) } }
-            AuthError.EMAIL_NOT_VERIFIED -> { sendEvent(LoginScreenEvents.ShowBottomSheet(content = SheetContent())) }
+            AuthDomainError.SOMETHING_WENT_WRONG -> {
+                _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) }
+            }
+
+            AuthDomainError.INVALID_EMAIL -> {
+                _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) }
+            }
+
+            AuthDomainError.INVALID_PASSWORD -> {
+                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) }
+            }
+
+            AuthDomainError.EMPTY_EMAIL -> {
+                _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) }
+            }
+
+            AuthDomainError.EMPTY_PASSWORD -> {
+                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) }
+            }
+
+            AuthDomainError.INVALID_CREDENTIALS -> {
+                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) }
+            }
+
+            AuthDomainError.EMAIL_NOT_VERIFIED -> {
+                sendEvent(
+                    LoginScreenEvents.ShowBottomSheet(
+                        content = SheetContent(
+                            title = "Email not verified",
+                            body = "Looks like you didn't verify your email yet. Please check your inbox and verify your email",
+                            button = "Dismiss"
+                        )
+                    )
+                )
+            }
             else -> Unit
         }
+        _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) }
     }
 }

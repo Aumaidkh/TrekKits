@@ -2,7 +2,7 @@ package com.hopcape.trekkits.auth.domain.usecase
 
 import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
-import com.hopcape.trekkits.auth.domain.errors.AuthError
+import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.models.User
 import com.hopcape.trekkits.auth.domain.validation.EmailValidator
 import com.hopcape.trekkits.auth.domain.validation.FullNameValidator
@@ -18,8 +18,8 @@ class RegisterUseCase @Inject constructor(
     private val fullNameValidator: FullNameValidator,
     private val authRepository: AuthRepository
 ) {
-    operator fun invoke(user: User,password: String,confirmPassword: String): Flow<UseCaseResult<User, AuthError>> {
-        return flow<UseCaseResult<User,AuthError>> {
+    operator fun invoke(user: User,password: String,confirmPassword: String): Flow<UseCaseResult<User, AuthDomainError>> {
+        return flow<UseCaseResult<User,AuthDomainError>> {
             emit(UseCaseResult.Loading())
             val fullNameValidationResult = fullNameValidator(user.name)
             if (!fullNameValidationResult.isValid && fullNameValidationResult.error != null) {
@@ -42,13 +42,13 @@ class RegisterUseCase @Inject constructor(
                 return@flow
             }
             if (password != confirmPassword) {
-                emit(UseCaseResult.Error(AuthError.PASSWORDS_DONT_MATCH))
+                emit(UseCaseResult.Error(AuthDomainError.PASSWORDS_DONT_MATCH))
                 return@flow
             }
             val result = authRepository.register(user,password)
             emit(UseCaseResult.Success(User()))
         }.catch {
-            emit(UseCaseResult.Error(AuthError.SOMETHING_WENT_WRONG))
+            emit(UseCaseResult.Error(AuthDomainError.SOMETHING_WENT_WRONG))
         }
     }
 }
