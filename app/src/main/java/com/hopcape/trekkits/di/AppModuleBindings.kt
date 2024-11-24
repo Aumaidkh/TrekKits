@@ -3,6 +3,7 @@ package com.hopcape.trekkits.di
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.hopcape.trekkits.auth.data.api.GoogleSignInService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +14,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModuleBindings {
+
+    @Provides
+    @Singleton
+    internal fun providesGoogleSignInService(): GoogleSignInService {
+        return GoogleSignInService()
+    }
 
     @Provides
     @Singleton

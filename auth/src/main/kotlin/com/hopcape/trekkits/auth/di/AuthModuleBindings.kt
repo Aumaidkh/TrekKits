@@ -1,7 +1,9 @@
 package com.hopcape.trekkits.auth.di
 
+import android.content.Context
 import com.hopcape.trekkits.auth.data.api.AuthService
 import com.hopcape.trekkits.auth.data.api.FirebaseAuthService
+import com.hopcape.trekkits.auth.data.api.GoogleSignInService
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
 import com.hopcape.trekkits.auth.data.repository.AuthRepositoryImpl
 import com.hopcape.trekkits.auth.domain.usecase.ForgotPasswordUseCase
@@ -15,6 +17,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Singleton
 
 @Module
 @InstallIn(ViewModelComponent::class)

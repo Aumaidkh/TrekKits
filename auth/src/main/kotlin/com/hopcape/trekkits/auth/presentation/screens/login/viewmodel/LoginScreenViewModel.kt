@@ -5,6 +5,7 @@ import com.hopcape.common.domain.base.presentation.BaseViewModel
 import com.hopcape.common.domain.wrappers.Result
 import com.hopcape.trekkits.auth.AuthError
 import com.hopcape.trekkits.auth.asUiText
+import com.hopcape.trekkits.auth.data.api.GoogleSignInService
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
 import com.hopcape.trekkits.auth.domain.validation.EmailValidator
 import com.hopcape.trekkits.auth.domain.validation.PasswordValidator
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class LoginScreenViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val googleSignInService: GoogleSignInService,
     private val emailValidator: EmailValidator,
     private val passwordValidator: PasswordValidator
 ) : BaseViewModel<LoginScreenState, LoginScreenAction, LoginScreenEvents>(
@@ -34,7 +36,7 @@ internal class LoginScreenViewModel @Inject constructor(
             is LoginScreenAction.ForgotPassword -> sendEvent(LoginScreenEvents.NavigateToForgotPassword)
             is LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
             is LoginScreenAction.SignInWithFacebook -> TODO()
-            is LoginScreenAction.SignInWithGoogle -> TODO()
+            is LoginScreenAction.SignInWithGoogle -> initiateGoogleSignIn()
             is LoginScreenAction.OnBottomSheetButtonClick -> sendEvent(LoginScreenEvents.DismissBottomSheet)
         }
     }
@@ -124,5 +126,20 @@ internal class LoginScreenViewModel @Inject constructor(
         sendEvent(LoginScreenEvents.Error(
             error = error.asUiText()
         ))
+    }
+
+    private fun initiateGoogleSignIn(){
+        viewModelScope.withDispatcher {
+            when(val result = googleSignInService.launchClient()){
+                is Result.Error -> {
+                    sendEvent(LoginScreenEvents.Error(
+                        error = result.error.asUiText()
+                    ))
+                }
+                is Result.Success -> {
+                    _state.update { state -> state.copy(displayState = DisplayState.Success) }
+                }
+            }
+        }
     }
 }
