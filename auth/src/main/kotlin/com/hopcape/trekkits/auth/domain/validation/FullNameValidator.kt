@@ -1,29 +1,26 @@
 package com.hopcape.trekkits.auth.domain.validation
 
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.error.Error
+import com.hopcape.common.domain.wrappers.Result
 
 class FullNameValidator {
-    operator fun invoke(fullName: String): ValidationResult {
+    operator fun invoke(fullName: String): Result<Unit,Error> {
         if (fullName.isBlank()) {
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_NAME
-            )
+            return Result.Error(NameError.BLANK_NAME)
         }
         if (fullName.isEmpty()) {
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_NAME
-            )
+            return Result.Error(NameError.EMPTY_NAME)
         }
         if (fullName.any { it.isDigit() }) {
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.NAME_CONTAINS_DIGIT
-            )
+            return Result.Error(NameError.NAME_CONTAINS_DIGIT)
         }
-        return ValidationResult(
-            isValid = true
-        )
+        return Result.Success(Unit)
+    }
+
+    enum class NameError: Error {
+        EMPTY_NAME,
+        BLANK_NAME,
+        NAME_CONTAINS_DIGIT,
+        INVALID_NAME
     }
 }

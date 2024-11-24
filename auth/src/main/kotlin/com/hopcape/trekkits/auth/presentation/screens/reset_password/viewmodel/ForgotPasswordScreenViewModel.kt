@@ -1,35 +1,26 @@
 package com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.base.presentation.BaseViewModel
+import com.hopcape.common.domain.wrappers.Result
+import com.hopcape.trekkits.auth.AuthError
+import com.hopcape.trekkits.auth.asUiText
 import com.hopcape.trekkits.auth.domain.usecase.ForgotPasswordUseCase
+import com.hopcape.trekkits.auth.domain.validation.EmailValidator
 import com.hopcape.trekkits.auth.presentation.SheetContent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ForgotPasswordScreenViewModel @Inject constructor(
-    private val forgotPasswordUseCase: ForgotPasswordUseCase
-) : ViewModel() {
+    private val forgotPasswordUseCase: ForgotPasswordUseCase,
+    private val emailValidator: EmailValidator
+) : BaseViewModel<ForgotPasswordScreenState, ForgotPasswordScreenAction, ForgotPasswordScreenEvent>(
+    initialState = ForgotPasswordScreenState()
+) {
 
-    private val _state = MutableStateFlow(ForgotPasswordScreenState())
-    val state: StateFlow<ForgotPasswordScreenState> = _state.asStateFlow()
-
-    private val _event = Channel<ForgotPasswordScreenEvent>()
-    val event = _event.receiveAsFlow()
-
-    fun onAction(action: ForgotPasswordScreenAction) {
+    override fun onAction(action: ForgotPasswordScreenAction) {
         when (action) {
             is ForgotPasswordScreenAction.EmailChanged -> handleEmailChange(action.email.trim())
 
@@ -37,7 +28,7 @@ internal class ForgotPasswordScreenViewModel @Inject constructor(
 
             is ForgotPasswordScreenAction.OnBackClick -> handleBackClick()
 
-            is ForgotPasswordScreenAction.Submit -> forgotPassword(_state.value.formState.email)
+            is ForgotPasswordScreenAction.Submit -> validateAndForgotPassword()
         }
 
     }
@@ -54,53 +45,68 @@ internal class ForgotPasswordScreenViewModel @Inject constructor(
     }
 
     private fun handleBackClick() {
-        pushEvent(ForgotPasswordScreenEvent.NavigateToLogin)
+        sendEvent(ForgotPasswordScreenEvent.NavigateToLogin)
     }
 
     private fun handleBottomSheetButtonClick() {
-        pushEvent(ForgotPasswordScreenEvent.NavigateToLogin)
+        sendEvent(ForgotPasswordScreenEvent.NavigateToLogin)
     }
 
-    private fun forgotPassword(email: String) {
-        forgotPasswordUseCase(email)
-            .onEach { result ->
-                when (result) {
-                    is UseCaseResult.Error -> handleError(result.error)
+    private fun validateAndForgotPassword(){
+        if (!isEmailValid()){
+            return
+        }
+        forgotPassword(_state.value.formState.email)
+    }
 
-                    is UseCaseResult.Loading -> _state.update { it.copy(displayState = DisplayState.Loading) }
-
-                    is UseCaseResult.Success -> {
-                        _state.update {
-                            it.copy(
-                                displayState = DisplayState.Success(
-                                    sheetContent = SheetContent(
-                                        title = "Verification Link Sent",
-                                        body = "Password reset link has been sent to $email. Please follow the link to update password.",
-                                        button = "Dismiss",
-                                    )
-                                )
-                            )
-                        }
+    private fun isEmailValid(email: String = _state.value.formState.email): Boolean{
+        return when(val result = emailValidator(email)){
+            is Result.Error -> {
+                when(result.error){
+                    EmailValidator.EmailError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) }
+                    }
+                    EmailValidator.EmailError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) }
+                    }
+                    EmailValidator.EmailError.BLANK -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be blank")) }
                     }
                 }
+                false
             }
-            .launchIn(viewModelScope)
+            is Result.Success -> true
+        }
     }
 
-    private fun handleError(error: AuthDomainError){
-        when(error){
-            AuthDomainError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) } }
-            AuthDomainError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
-            AuthDomainError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
-            else -> Unit
+    private fun forgotPassword(email: String){
+        viewModelScope.withDispatcher {
+            forgotPasswordUseCase(email).also {
+                handleForgotPasswordResult(it)
+            }
         }
+    }
+
+    private fun handleForgotPasswordResult(result: Result<Unit, AuthError>){
+        when(result){
+            is Result.Error -> handleError(result.error)
+            is Result.Success -> _state.update {
+                it.copy(
+                    displayState = DisplayState.Success(
+                        sheetContent = SheetContent(
+                            title = "Verification Link Sent",
+                            body = "Password reset link has been sent to ${_state.value.formState.email}. Please follow the link to update password.",
+                            button = "Dismiss",
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private fun handleError(error: AuthError){
+         sendEvent(ForgotPasswordScreenEvent.Error(error.asUiText()))
         _state.update { it.copy(displayState = DisplayState.Initial) }
-    }
-
-    private fun pushEvent(event: ForgotPasswordScreenEvent) {
-        viewModelScope.launch {
-            _event.send(event)
-        }
     }
 
 }

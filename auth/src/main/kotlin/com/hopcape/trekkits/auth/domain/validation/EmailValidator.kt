@@ -1,29 +1,25 @@
 package com.hopcape.trekkits.auth.domain.validation
 
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.error.Error
+import com.hopcape.common.domain.wrappers.Result
 
 class EmailValidator {
-    operator fun invoke(email: String): ValidationResult {
+    operator fun invoke(email: String): Result<Unit,EmailError> {
         if (email.isBlank()){
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_EMAIL
-            )
+            return Result.Error(EmailError.BLANK)
         }
         if (email.isEmpty()){
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_EMAIL
-            )
+            return Result.Error(EmailError.EMPTY)
         }
         if (!email.contains("@")){
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.INVALID_EMAIL
-            )
+            return Result.Error(EmailError.INVALID)
         }
-        return ValidationResult(
-            isValid = true
-        )
+        return Result.Success(Unit)
+    }
+
+    enum class EmailError: Error {
+        EMPTY,
+        INVALID,
+        BLANK
     }
 }

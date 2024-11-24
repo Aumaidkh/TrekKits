@@ -1,9 +1,11 @@
 package com.hopcape.trekkits.auth.presentation.screens.login.viewmodel
 
+import com.hopcape.common.domain.base.presentation.BaseState
+
 data class LoginScreenState(
     val formState: FormState = FormState(),
     val displayState: DisplayState? = null
-)
+): BaseState
 
 data class FormState(
     val email: String = "",

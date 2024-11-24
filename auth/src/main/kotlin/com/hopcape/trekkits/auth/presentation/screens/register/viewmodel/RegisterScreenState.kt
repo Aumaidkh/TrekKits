@@ -1,11 +1,12 @@
 package com.hopcape.trekkits.auth.presentation.screens.register.viewmodel
 
+import com.hopcape.common.domain.base.presentation.BaseState
 import com.hopcape.trekkits.auth.presentation.SheetContent
 
 data class RegisterScreenState(
     val formState: FormState = FormState(),
     val displayState: DisplayState = DisplayState.Initial
-){
+): BaseState{
     data class FormState(
         val firstName: String = "",
         val firstNameError: String? = null,

@@ -3,7 +3,7 @@ package com.hopcape.trekkits.auth.data.api
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.hopcape.common.domain.wrappers.Result
-import com.hopcape.trekkits.auth.data.AuthDataError
+import com.hopcape.trekkits.auth.AuthError
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ internal class FirebaseAuthService @Inject constructor(
     override suspend fun login(
         email: String,
         password: String
-    ): Result<Unit, AuthDataError> {
+    ): Result<Unit, AuthError> {
         return try {
             val result = firebaseAuth.signInWithEmailAndPassword(email,password)
                 .await()
@@ -22,13 +22,13 @@ internal class FirebaseAuthService @Inject constructor(
                 if (user.isEmailVerified) {
                     Result.Success(Unit)
                 } else {
-                    Result.Error(AuthDataError.EMAIL_NOT_VERIFIED)
+                    Result.Error(AuthError.Remote.EMAIL_NOT_VERIFIED)
                 }
             } ?: run {
-                Result.Error(AuthDataError.USER_NOT_FOUND)
+                Result.Error(AuthError.Remote.USER_NOT_FOUND)
             }
         }catch (e: Exception){
-            Result.Error(AuthDataError.SOMETHING_WENT_WRONG)
+            Result.Error(AuthError.Remote.SOMETHING_WENT_WRONG)
         }
     }
 
@@ -36,7 +36,7 @@ internal class FirebaseAuthService @Inject constructor(
         email: String,
         password: String,
         name: String
-    ): Result<Unit, AuthDataError> {
+    ): Result<Unit, AuthError> {
         return try {
             // Create user with email and password
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -53,20 +53,20 @@ internal class FirebaseAuthService @Inject constructor(
                 user.sendEmailVerification().await()
                 Result.Success(Unit)
             } ?: run {
-                Result.Error(AuthDataError.USER_NOT_FOUND)
+                Result.Error(AuthError.Remote.USER_NOT_FOUND)
             }
         } catch (e: Exception) {
-            Result.Error(AuthDataError.SOMETHING_WENT_WRONG)
+            Result.Error(AuthError.Remote.SOMETHING_WENT_WRONG)
         }
     }
 
-    override suspend fun forgotPassword(email: String): Result<Unit, AuthDataError> {
+    override suspend fun forgotPassword(email: String): Result<Unit, AuthError> {
         return try {
             firebaseAuth.sendPasswordResetEmail(email)
                 .await()
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(AuthDataError.SOMETHING_WENT_WRONG)
+            Result.Error(AuthError.Remote.SOMETHING_WENT_WRONG)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.hopcape.trekkits.auth.di
 
-import com.google.firebase.auth.FirebaseAuth
 import com.hopcape.trekkits.auth.data.api.AuthService
 import com.hopcape.trekkits.auth.data.api.FirebaseAuthService
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
@@ -31,39 +30,27 @@ abstract class AuthModuleBindings{
 
         @Provides
         internal fun providesLoginUseCase(
-            emailValidator: EmailValidator,
-            passwordValidator: PasswordValidator,
             repository: AuthRepository
         ): LoginUseCase{
             return LoginUseCase(
-                emailValidator = emailValidator,
-                passwordValidator = passwordValidator,
                 repository = repository
             )
         }
 
         @Provides
         internal fun providesRegisterUseCase(
-            emailValidator: EmailValidator,
-            fullNameValidator: FullNameValidator,
-            passwordValidator: PasswordValidator,
             repository: AuthRepository
         ): RegisterUseCase {
             return RegisterUseCase(
-                emailValidator = emailValidator,
-                passwordValidator = passwordValidator,
-                fullNameValidator = fullNameValidator,
                 authRepository = repository
             )
         }
 
         @Provides
         internal fun providesForgotPasswordUseCase(
-            emailValidator: EmailValidator,
             repository: AuthRepository
         ): ForgotPasswordUseCase {
             return ForgotPasswordUseCase(
-                emailValidator = emailValidator,
                 repository = repository
             )
         }
