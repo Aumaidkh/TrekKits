@@ -7,12 +7,16 @@ import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
 import com.hopcape.trekkits.auth.domain.models.User
 import com.hopcape.trekkits.auth.domain.usecase.RegisterUseCase
+import com.hopcape.trekkits.auth.presentation.SheetContent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +25,9 @@ class RegisterScreenViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(RegisterScreenState())
     val state: StateFlow<RegisterScreenState> = _state
+
+    private val _events = Channel<RegisterScreenEvents>()
+    val events get() = _events.receiveAsFlow()
 
     fun onAction(action: RegisterScreenAction) {
         when (action) {
@@ -48,8 +55,18 @@ class RegisterScreenViewModel @Inject constructor(
                     confirmPassword = _state.value.formState.confirmPassword
                 )
             }
+
+            is RegisterScreenAction.OnBottomSheetButtonClick -> {
+                pushEvent(RegisterScreenEvents.DismissBottomSheet)
+            }
             else -> {}
 
+        }
+    }
+
+    private fun pushEvent(event: RegisterScreenEvents){
+        viewModelScope.launch {
+            _events.send(event)
         }
     }
 
@@ -62,7 +79,19 @@ class RegisterScreenViewModel @Inject constructor(
             when(emission){
                 is UseCaseResult.Error -> { _state.update { it.copy(displayState = RegisterScreenState.DisplayState.Initial) }; handleError(emission.error) }
                 is UseCaseResult.Loading -> { _state.update { it.copy(displayState = RegisterScreenState.DisplayState.Loading) } }
-                is UseCaseResult.Success -> { _state.update { it.copy(displayState = RegisterScreenState.DisplayState.Success) } }
+                is UseCaseResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            displayState = RegisterScreenState.DisplayState.Success(
+                                sheetContent = SheetContent(
+                                    title = "Success",
+                                    body = "You are one step away from registering into TrekKits. Please click on the email confirmation link sent to you on :${_state.value.formState.email}.",
+                                    button = "Dismiss"
+                                )
+                            )
+                        )
+                    }
+                }
             }
         }.launchIn(viewModelScope)
     }
@@ -81,5 +110,6 @@ class RegisterScreenViewModel @Inject constructor(
             AuthDomainError.INVALID_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) } }
             else -> {}
         }
+        _state.update { state -> state.copy(displayState = RegisterScreenState.DisplayState.Error(message = "Something went wrong")) }
     }
 }

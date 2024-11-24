@@ -51,6 +51,7 @@ internal fun LoginScreen(
                 onClick = { onAction(LoginScreenAction.Register) }
             )
         },
+        onBottomSheetButtonClick = { onAction(LoginScreenAction.OnBottomSheetButtonClick) },
         sheetContent = sheetContent
     ){
         AuthInputField(

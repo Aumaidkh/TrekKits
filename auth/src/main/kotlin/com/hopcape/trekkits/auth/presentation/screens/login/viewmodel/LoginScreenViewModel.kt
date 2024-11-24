@@ -51,6 +51,7 @@ class LoginScreenViewModel @Inject constructor(
             LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
             LoginScreenAction.SignInWithFacebook -> TODO()
             LoginScreenAction.SignInWithGoogle -> TODO()
+            LoginScreenAction.OnBottomSheetButtonClick -> sendEvent(LoginScreenEvents.DismissBottomSheet)
         }
     }
 

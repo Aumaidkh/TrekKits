@@ -3,6 +3,7 @@ package com.hopcape.trekkits.auth.presentation.screens.register
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.Registe
 internal fun RegisterScreen(
     modifier: Modifier = Modifier,
     scrollState: ScrollState,
+    bottomSheetScaffoldState: BottomSheetScaffoldState,
     screenState: RegisterScreenState = RegisterScreenState(),
     onAction: (RegisterScreenAction) -> Unit = {}
 ) {
@@ -45,6 +47,9 @@ internal fun RegisterScreen(
         },
         illustrationResId = R.drawable.welcoming,
         illustrationHeight = 200.dp,
+        bottomSheetScaffoldState = bottomSheetScaffoldState,
+        sheetContent = (screenState.displayState as? RegisterScreenState.DisplayState.Success)?.sheetContent,
+        onBottomSheetButtonClick = { onAction(RegisterScreenAction.OnBottomSheetButtonClick) },
         content = {
             AuthInputField(
                 modifier = Modifier,

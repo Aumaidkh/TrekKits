@@ -9,4 +9,5 @@ sealed class RegisterScreenAction {
     data object Login : RegisterScreenAction()
     data object SignInWithGoogle : RegisterScreenAction()
     data object SignInWithFacebook : RegisterScreenAction()
+    data object OnBottomSheetButtonClick: RegisterScreenAction()
 }

@@ -1,5 +1,6 @@
 package com.hopcape.trekkits.auth.domain.usecase
 
+import com.hopcape.common.domain.wrappers.Result
 import com.hopcape.common.domain.wrappers.UseCaseResult
 import com.hopcape.trekkits.auth.data.repository.AuthRepository
 import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
@@ -45,7 +46,10 @@ class RegisterUseCase @Inject constructor(
                 emit(UseCaseResult.Error(AuthDomainError.PASSWORDS_DONT_MATCH))
                 return@flow
             }
-            val result = authRepository.register(user,password)
+            when(val result = authRepository.register(user,password)){
+                is Result.Error -> emit(UseCaseResult.Error(result.error))
+                is Result.Success -> emit(UseCaseResult.Success(result.data))
+            }
             emit(UseCaseResult.Success(User()))
         }.catch {
             emit(UseCaseResult.Error(AuthDomainError.SOMETHING_WENT_WRONG))

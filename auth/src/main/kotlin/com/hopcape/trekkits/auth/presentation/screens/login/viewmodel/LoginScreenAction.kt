@@ -8,4 +8,5 @@ sealed interface LoginScreenAction {
     data object ForgotPassword: LoginScreenAction
     data object SignInWithGoogle: LoginScreenAction
     data object SignInWithFacebook: LoginScreenAction
+    data object OnBottomSheetButtonClick: LoginScreenAction
 }

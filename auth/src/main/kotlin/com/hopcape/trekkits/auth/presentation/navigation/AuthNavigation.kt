@@ -33,6 +33,8 @@ import com.hopcape.trekkits.auth.presentation.screens.login.LoginScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenEvents
 import com.hopcape.trekkits.auth.presentation.screens.register.RegisterScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenViewModel
+import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenEvents
+import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenState
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenViewModel
 import com.hopcape.trekkits.auth.presentation.screens.reset_password.ForgotPasswordScreen
 import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.DisplayState
@@ -41,6 +43,7 @@ import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.F
 
 @OptIn(ExperimentalMaterial3Api::class) fun NavGraphBuilder.authNavigation(
     navController: NavHostController,
+    onAuthenticationSuccess: () -> Unit
 ){
     navigation<Auth>( startDestination = Login ){
         composable<Login>(
@@ -63,13 +66,23 @@ import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.F
                     initialValue = SheetValue.Hidden
                 )
             )
-
+            LaunchedEffect(state.displayState){
+                when(state.displayState){
+                    is com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.DisplayState.Success -> {
+                        onAuthenticationSuccess()
+                    }
+                    else -> Unit
+                }
+            }
             LaunchedEffect(event){
                 when(event){
                     is LoginScreenEvents.NavigateToRegister -> navController.navigate(Register)
                     is LoginScreenEvents.NavigateToForgotPassword -> navController.navigate(ForgotPassword)
                     is LoginScreenEvents.ShowBottomSheet -> {
                         bottomSheetScaffoldState.bottomSheetState.expand()
+                    }
+                    is LoginScreenEvents.DismissBottomSheet -> {
+                        bottomSheetScaffoldState.bottomSheetState.hide()
                     }
                     else -> Unit
                 }
@@ -98,11 +111,38 @@ import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.F
         ) {
             val viewModel = hiltViewModel<RegisterScreenViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val events by viewModel.events.collectAsStateWithLifecycle(null)
+
             val scrollState = rememberScrollState()
+            val bottomSheetState = rememberBottomSheetScaffoldState(
+                bottomSheetState = SheetState(
+                    skipPartiallyExpanded = false,
+                    density = LocalDensity.current,
+                    initialValue = SheetValue.Hidden
+                )
+            )
+
+            LaunchedEffect(state.displayState){
+                when(state.displayState){
+                    is RegisterScreenState.DisplayState.Success -> {
+                        bottomSheetState.bottomSheetState.expand()
+                    }
+                    else -> Unit
+                }
+            }
+
+            LaunchedEffect(events){
+                when(events){
+                    is RegisterScreenEvents.DismissBottomSheet -> bottomSheetState.bottomSheetState.hide()
+                    else -> Unit
+                }
+            }
+
             RegisterScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 scrollState = scrollState,
+                bottomSheetScaffoldState = bottomSheetState,
                 screenState = state,
                 onAction = viewModel::onAction
             )

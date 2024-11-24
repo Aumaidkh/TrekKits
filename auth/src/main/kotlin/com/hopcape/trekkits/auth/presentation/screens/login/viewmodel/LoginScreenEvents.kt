@@ -6,4 +6,5 @@ sealed interface LoginScreenEvents {
     data object NavigateToRegister : LoginScreenEvents
     data class ShowBottomSheet(val content: SheetContent): LoginScreenEvents
     data object NavigateToForgotPassword: LoginScreenEvents
+    data object DismissBottomSheet: LoginScreenEvents
 }

@@ -27,7 +27,10 @@ fun TrekKitsApp(modifier: Modifier = Modifier,navController: NavHostController =
                 text = "Home Screen")
         }
         authNavigation(
-            navController = navController
+            navController = navController,
+            onAuthenticationSuccess = {
+                navController.navigate(Routes.HomeScreen)
+            }
         )
     }
 }
