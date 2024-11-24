@@ -35,14 +35,14 @@ class RegisterScreenViewModel @Inject constructor(
                 _state.update { state -> state.copy(formState = state.formState.copy(firstName = action.value, firstNameError = null)) }
             }
             is RegisterScreenAction.EmailChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(email = action.value, emailError = null)) }
+                _state.update { state -> state.copy(formState = state.formState.copy(email = action.value.trim(), emailError = null)) }
             }
             is RegisterScreenAction.PasswordChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(password = action.value, passwordError = null)) }
+                _state.update { state -> state.copy(formState = state.formState.copy(password = action.value.trim(), passwordError = null)) }
             }
 
             is RegisterScreenAction.ConfirmPasswordChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(confirmPassword = action.value, confirmPasswordError = null)) }
+                _state.update { state -> state.copy(formState = state.formState.copy(confirmPassword = action.value.trim(), confirmPasswordError = null)) }
             }
 
             is RegisterScreenAction.Register -> {

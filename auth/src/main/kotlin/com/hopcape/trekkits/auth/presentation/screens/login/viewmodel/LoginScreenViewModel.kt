@@ -32,14 +32,14 @@ class LoginScreenViewModel @Inject constructor(
             is LoginScreenAction.EmailChanged -> {
                 _state.value = _state.value.copy(
                     formState = _state.value.formState.copy(
-                        email = action.email
+                        email = action.email.trim()
                     )
                 )
             }
             is LoginScreenAction.PasswordChanged -> {
                 _state.value = _state.value.copy(
                     formState = _state.value.formState.copy(
-                        password = action.password
+                        password = action.password.trim()
                     )
                 )
             }

@@ -31,7 +31,7 @@ internal class ForgotPasswordScreenViewModel @Inject constructor(
 
     fun onAction(action: ForgotPasswordScreenAction) {
         when (action) {
-            is ForgotPasswordScreenAction.EmailChanged -> handleEmailChange(action.email)
+            is ForgotPasswordScreenAction.EmailChanged -> handleEmailChange(action.email.trim())
 
             is ForgotPasswordScreenAction.OnBottomSheetButtonClick -> handleBottomSheetButtonClick()
 
