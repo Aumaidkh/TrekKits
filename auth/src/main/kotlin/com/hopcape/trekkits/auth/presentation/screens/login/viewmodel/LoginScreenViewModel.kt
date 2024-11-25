@@ -14,6 +14,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+/**
+ * Login screen view model
+ *
+ * @property loginUseCase
+ * @property googleSignInService
+ * @property emailValidator
+ * @property passwordValidator
+ * @constructor Create empty Login screen view model
+ */
 @HiltViewModel
 internal class LoginScreenViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
@@ -24,8 +33,16 @@ internal class LoginScreenViewModel @Inject constructor(
     initialState = LoginScreenState()
 ) {
 
+
+    /**
+     * On action
+     *
+     * @param action
+     */
     override fun onAction(action: LoginScreenAction) {
         when (action) {
+            is LoginScreenAction.ShowHidePassword -> handleShowHidePassword()
+
             is LoginScreenAction.EmailChanged -> handleEmailChange(
                 email = action.email
             )
@@ -41,14 +58,40 @@ internal class LoginScreenViewModel @Inject constructor(
         }
     }
 
+    private fun handleShowHidePassword(){
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    showPassword = !it.formState.showPassword
+                )
+            )
+        }
+    }
+
+    /**
+     * Handle email change
+     *
+     * @param email
+     */
     private fun handleEmailChange(email: String){
         _state.update { state -> state.copy(formState = state.formState.copy(email = email.trim())) }
     }
 
+
+    /**
+     * Handle password change
+     *
+     * @param password
+     */
     private fun handlePasswordChange(password: String){
         _state.update { state -> state.copy(formState = state.formState.copy(password = password.trim())) }
     }
 
+
+    /**
+     * Validate and login
+     *
+     */
     private fun validateAndLogin(){
         if (!shouldBeingLogin()){
             return
@@ -67,10 +110,23 @@ internal class LoginScreenViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Should being login
+     *
+     * @return
+     */
     private fun shouldBeingLogin(): Boolean {
         return isValidEmail(_state.value.formState.email) && isValidPassword(_state.value.formState.password)
     }
 
+
+    /**
+     * Is valid email
+     *
+     * @param email
+     * @return
+     */
     private fun isValidEmail(email: String): Boolean {
         return when(val result = emailValidator(email)){
             is Result.Error -> {
@@ -93,6 +149,13 @@ internal class LoginScreenViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Is valid password
+     *
+     * @param password
+     * @return
+     */
     private fun isValidPassword(password: String): Boolean {
         return when(val result = passwordValidator(password)){
             is Result.Error -> {
@@ -110,6 +173,12 @@ internal class LoginScreenViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Handle use case error
+     *
+     * @param error
+     */
     private fun handleUseCaseError(error: AuthError){
         if (error == AuthError.Remote.EMAIL_NOT_VERIFIED){
             sendEvent(
@@ -128,6 +197,11 @@ internal class LoginScreenViewModel @Inject constructor(
         ))
     }
 
+
+    /**
+     * Initiate google sign in
+     *
+     */
     private fun initiateGoogleSignIn(){
         viewModelScope.withDispatcher {
             when(val result = googleSignInService.launchClient()){

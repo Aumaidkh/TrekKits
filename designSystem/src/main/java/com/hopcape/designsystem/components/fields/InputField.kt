@@ -1,6 +1,5 @@
 package com.hopcape.designsystem.components.fields
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import com.hopcape.designsystem.styles.hintSmall
 
 @Composable
@@ -29,8 +27,7 @@ fun InputField(
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     TextField(
-        modifier = modifier
-            .padding(bottom = 12.dp),
+        modifier = modifier,
         value = value,
         onValueChange = onValueChange,
         label = {

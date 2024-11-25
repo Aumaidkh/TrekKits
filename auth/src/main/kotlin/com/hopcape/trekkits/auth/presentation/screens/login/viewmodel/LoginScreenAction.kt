@@ -11,4 +11,5 @@ sealed interface LoginScreenAction: BaseAction {
     data object SignInWithGoogle: LoginScreenAction
     data object SignInWithFacebook: LoginScreenAction
     data object OnBottomSheetButtonClick: LoginScreenAction
+    data object ShowHidePassword: LoginScreenAction
 }
