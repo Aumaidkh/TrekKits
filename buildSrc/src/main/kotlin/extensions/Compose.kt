@@ -37,3 +37,7 @@ fun DependencyHandlerScope.addDesignSystemModule(){
 fun DependencyHandlerScope.addCommonModule(){
     addProject("common")
 }
+
+fun DependencyHandlerScope.addCoreModule(){
+    addProject("core")
+}

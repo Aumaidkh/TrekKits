@@ -1,4 +1,5 @@
 import extensions.addCommonModule
+import extensions.addCoreModule
 import extensions.addDesignSystemModule
 import extensions.addFirebase
 
@@ -18,5 +19,6 @@ dependencies {
     addFirebase(project)
     addDesignSystemModule()
     addCommonModule()
+    addCoreModule()
     implementation(libs.androidx.navigation.compose)
 }
