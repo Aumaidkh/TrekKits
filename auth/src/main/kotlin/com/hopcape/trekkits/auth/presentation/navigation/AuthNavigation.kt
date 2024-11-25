@@ -4,25 +4,18 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
@@ -31,8 +24,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.hopcape.trekkits.auth.presentation.screens.login.LoginScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenEvents
-import com.hopcape.trekkits.auth.presentation.screens.register.RegisterScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenViewModel
+import com.hopcape.trekkits.auth.presentation.screens.register.RegisterScreen
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenEvents
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenState
 import com.hopcape.trekkits.auth.presentation.screens.register.viewmodel.RegisterScreenViewModel
@@ -151,7 +144,7 @@ import com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel.F
         composable<ForgotPassword> {
             val viewModel = hiltViewModel<ForgotPasswordScreenViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
-            val event by viewModel.event.collectAsStateWithLifecycle(null)
+            val event by viewModel.events.collectAsStateWithLifecycle(null)
             val scrollState = rememberScrollState()
             val bottomSheetState = rememberBottomSheetScaffoldState(
                 bottomSheetState = SheetState(

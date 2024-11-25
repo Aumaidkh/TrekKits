@@ -1,6 +1,8 @@
 package com.hopcape.trekkits.auth.presentation.screens.register.viewmodel
 
-sealed class RegisterScreenAction {
+import com.hopcape.common.domain.base.presentation.BaseAction
+
+sealed class RegisterScreenAction: BaseAction {
     data class FirstNameChanged(val value: String) : RegisterScreenAction()
     data class EmailChanged(val value: String) : RegisterScreenAction()
     data class PasswordChanged(val value: String) : RegisterScreenAction()

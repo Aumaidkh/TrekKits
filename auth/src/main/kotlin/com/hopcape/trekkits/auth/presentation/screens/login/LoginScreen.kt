@@ -1,21 +1,22 @@
 package com.hopcape.trekkits.auth.presentation.screens.login
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SheetState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.hopcape.designsystem.components.buttons.TextWithClickableText
 import com.hopcape.designsystem.styles.bodyLowEmphasis
@@ -25,6 +26,8 @@ import com.hopcape.trekkits.auth.presentation.composables.AuthInputField
 import com.hopcape.trekkits.auth.presentation.composables.AuthScreen
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenAction
 import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.LoginScreenState
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.toPasswordIconResId
+import com.hopcape.trekkits.auth.presentation.screens.login.viewmodel.toVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +73,7 @@ internal fun LoginScreen(
             modifier = Modifier
                 .padding(
                     top = 8.dp,
-                    bottom = 24.dp
+                    bottom = 0.dp
                 )
                 .fillMaxWidth(),
             text = "Password",
@@ -79,17 +82,36 @@ internal fun LoginScreen(
             startIconResId = com.hopcape.designsystem.R.drawable.key,
             error = screenState.formState.passwordError,
             trailingContent = {
-                TextButton(
-                    modifier = Modifier,
-                    onClick = { onAction(LoginScreenAction.ForgotPassword) }
-                ) {
-                    Text("Forgot Password?")
+                IconButton(
+                    onClick = {
+                        onAction(LoginScreenAction.ShowHidePassword)
+                    }
+                ){
+                    Icon(
+                        painter = painterResource(screenState.toPasswordIconResId()),
+                        contentDescription = ""
+                    )
                 }
             },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = screenState.toVisualTransformation(),
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
         )
+
+        Row(
+            modifier = Modifier
+                .padding(bottom = 36.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                modifier = Modifier,
+                onClick = { onAction(LoginScreenAction.ForgotPassword) }
+            ) {
+                Text("Forgot Password?")
+            }
+        }
 
         AuthButton(
             modifier = Modifier

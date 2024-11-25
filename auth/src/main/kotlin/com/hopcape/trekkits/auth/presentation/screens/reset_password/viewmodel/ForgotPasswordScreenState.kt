@@ -1,5 +1,6 @@
 package com.hopcape.trekkits.auth.presentation.screens.reset_password.viewmodel
 
+import com.hopcape.common.domain.base.presentation.BaseState
 import com.hopcape.trekkits.auth.presentation.SheetContent
 
 data class FormState(
@@ -10,7 +11,7 @@ data class FormState(
 data class ForgotPasswordScreenState(
     val formState: FormState = FormState(),
     val displayState: DisplayState = DisplayState.Initial
-)
+): BaseState
 
 sealed interface DisplayState {
     data object Initial : DisplayState

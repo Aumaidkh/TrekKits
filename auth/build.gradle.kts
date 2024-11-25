@@ -1,4 +1,5 @@
 import extensions.addCommonModule
+import extensions.addCredentialsManager
 import extensions.addDesignSystemModule
 import extensions.addFirebase
 
@@ -15,7 +16,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.googleid)
     addFirebase(project)
+    addCredentialsManager(project)
     addDesignSystemModule()
     addCommonModule()
     implementation(libs.androidx.navigation.compose)

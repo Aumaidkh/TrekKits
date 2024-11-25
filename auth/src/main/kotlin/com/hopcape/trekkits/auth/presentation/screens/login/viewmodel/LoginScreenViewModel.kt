@@ -1,124 +1,219 @@
 package com.hopcape.trekkits.auth.presentation.screens.login.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.base.presentation.BaseViewModel
+import com.hopcape.common.domain.wrappers.Result
+import com.hopcape.trekkits.auth.AuthError
+import com.hopcape.trekkits.auth.asUiText
+import com.hopcape.trekkits.auth.data.api.GoogleSignInService
 import com.hopcape.trekkits.auth.domain.usecase.LoginUseCase
+import com.hopcape.trekkits.auth.domain.validation.EmailValidator
+import com.hopcape.trekkits.auth.domain.validation.PasswordValidator
 import com.hopcape.trekkits.auth.presentation.SheetContent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Login screen view model
+ *
+ * @property loginUseCase
+ * @property googleSignInService
+ * @property emailValidator
+ * @property passwordValidator
+ * @constructor Create empty Login screen view model
+ */
 @HiltViewModel
-class LoginScreenViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
-): ViewModel() {
-    private val _state = MutableStateFlow(LoginScreenState())
-    val state = _state.asStateFlow()
+internal class LoginScreenViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase,
+    private val googleSignInService: GoogleSignInService,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator
+) : BaseViewModel<LoginScreenState, LoginScreenAction, LoginScreenEvents>(
+    initialState = LoginScreenState()
+) {
 
-    private val _events = Channel<LoginScreenEvents>()
-    val events = _events.receiveAsFlow()
 
-    fun onAction(action: LoginScreenAction) {
+    /**
+     * On action
+     *
+     * @param action
+     */
+    override fun onAction(action: LoginScreenAction) {
         when (action) {
-            is LoginScreenAction.EmailChanged -> {
-                _state.value = _state.value.copy(
-                    formState = _state.value.formState.copy(
-                        email = action.email.trim()
-                    )
-                )
-            }
-            is LoginScreenAction.PasswordChanged -> {
-                _state.value = _state.value.copy(
-                    formState = _state.value.formState.copy(
-                        password = action.password.trim()
-                    )
-                )
-            }
-            is LoginScreenAction.Login -> {
-                login()
-            }
+            is LoginScreenAction.ShowHidePassword -> handleShowHidePassword()
 
-            LoginScreenAction.ForgotPassword -> sendEvent(LoginScreenEvents.NavigateToForgotPassword)
-            LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
-            LoginScreenAction.SignInWithFacebook -> TODO()
-            LoginScreenAction.SignInWithGoogle -> TODO()
-            LoginScreenAction.OnBottomSheetButtonClick -> sendEvent(LoginScreenEvents.DismissBottomSheet)
+            is LoginScreenAction.EmailChanged -> handleEmailChange(
+                email = action.email
+            )
+            is LoginScreenAction.PasswordChanged -> handlePasswordChange(
+                password = action.password
+            )
+            is LoginScreenAction.Login -> validateAndLogin()
+            is LoginScreenAction.ForgotPassword -> sendEvent(LoginScreenEvents.NavigateToForgotPassword)
+            is LoginScreenAction.Register -> sendEvent(LoginScreenEvents.NavigateToRegister)
+            is LoginScreenAction.SignInWithFacebook -> TODO()
+            is LoginScreenAction.SignInWithGoogle -> initiateGoogleSignIn()
+            is LoginScreenAction.OnBottomSheetButtonClick -> sendEvent(LoginScreenEvents.DismissBottomSheet)
         }
     }
 
-    private fun login(){
-        loginUseCase(
-            email = _state.value.formState.email,
-            password = _state.value.formState.password
-        ).onEach { result ->
-            when (result) {
-                is UseCaseResult.Error -> {
-                    handleError(result.error)
-                }
-                is UseCaseResult.Loading -> {
-                    _state.update { state -> state.copy(displayState = DisplayState.Loading) }
-                }
-                is UseCaseResult.Success -> {
+    private fun handleShowHidePassword(){
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    showPassword = !it.formState.showPassword
+                )
+            )
+        }
+    }
+
+    /**
+     * Handle email change
+     *
+     * @param email
+     */
+    private fun handleEmailChange(email: String){
+        _state.update { state -> state.copy(formState = state.formState.copy(email = email.trim())) }
+    }
+
+
+    /**
+     * Handle password change
+     *
+     * @param password
+     */
+    private fun handlePasswordChange(password: String){
+        _state.update { state -> state.copy(formState = state.formState.copy(password = password.trim())) }
+    }
+
+
+    /**
+     * Validate and login
+     *
+     */
+    private fun validateAndLogin(){
+        if (!shouldBeingLogin()){
+            return
+        }
+        viewModelScope.withDispatcher {
+            val useCaseResult = loginUseCase(
+                email = _state.value.formState.email,
+                password = _state.value.formState.password
+            )
+            when(useCaseResult){
+                is Result.Error -> handleUseCaseError(useCaseResult.error)
+                is Result.Success -> {
                     _state.update { state -> state.copy(displayState = DisplayState.Success) }
                 }
             }
-        }.launchIn(viewModelScope)
-    }
-
-    private fun sendEvent(event: LoginScreenEvents){
-        viewModelScope.launch {
-            _events.send(event)
         }
     }
 
-    private fun handleError(error: AuthDomainError) {
-        when(error){
-            AuthDomainError.SOMETHING_WENT_WRONG -> {
-                _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) }
-            }
 
-            AuthDomainError.INVALID_EMAIL -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) }
-            }
+    /**
+     * Should being login
+     *
+     * @return
+     */
+    private fun shouldBeingLogin(): Boolean {
+        return isValidEmail(_state.value.formState.email) && isValidPassword(_state.value.formState.password)
+    }
 
-            AuthDomainError.INVALID_PASSWORD -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) }
-            }
 
-            AuthDomainError.EMPTY_EMAIL -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) }
+    /**
+     * Is valid email
+     *
+     * @param email
+     * @return
+     */
+    private fun isValidEmail(email: String): Boolean {
+        return when(val result = emailValidator(email)){
+            is Result.Error -> {
+                when(result.error){
+                    EmailValidator.EmailError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) }
+                        false
+                    }
+                    EmailValidator.EmailError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) }
+                        false
+                    }
+                    EmailValidator.EmailError.BLANK -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be blank")) }
+                        false
+                    }
+                }
             }
+            is Result.Success -> return true
+        }
+    }
 
-            AuthDomainError.EMPTY_PASSWORD -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) }
+
+    /**
+     * Is valid password
+     *
+     * @param password
+     * @return
+     */
+    private fun isValidPassword(password: String): Boolean {
+        return when(val result = passwordValidator(password)){
+            is Result.Error -> {
+                when(result.error){
+                    PasswordValidator.PasswordError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) }
+                    }
+                    PasswordValidator.PasswordError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) }
+                    }
+                }
+                false
             }
+            is Result.Success -> true
+        }
+    }
 
-            AuthDomainError.INVALID_CREDENTIALS -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) }
-            }
 
-            AuthDomainError.EMAIL_NOT_VERIFIED -> {
-                sendEvent(
-                    LoginScreenEvents.ShowBottomSheet(
-                        content = SheetContent(
-                            title = "Email not verified",
-                            body = "Looks like you didn't verify your email yet. Please check your inbox and verify your email",
-                            button = "Dismiss"
-                        )
+    /**
+     * Handle use case error
+     *
+     * @param error
+     */
+    private fun handleUseCaseError(error: AuthError){
+        if (error == AuthError.Remote.EMAIL_NOT_VERIFIED){
+            sendEvent(
+                LoginScreenEvents.ShowBottomSheet(
+                    content = SheetContent(
+                        title = "Email not verified",
+                        body = "Looks like you didn't verify your email yet. Please check your inbox and verify your email",
+                        button = "Dismiss"
                     )
                 )
-            }
-            else -> Unit
+            )
+            return
         }
-        _state.update { state -> state.copy(displayState = DisplayState.Error(message = "Something went wrong")) }
+        sendEvent(LoginScreenEvents.Error(
+            error = error.asUiText()
+        ))
+    }
+
+
+    /**
+     * Initiate google sign in
+     *
+     */
+    private fun initiateGoogleSignIn(){
+        viewModelScope.withDispatcher {
+            when(val result = googleSignInService.launchClient()){
+                is Result.Error -> {
+                    sendEvent(LoginScreenEvents.Error(
+                        error = result.error.asUiText()
+                    ))
+                }
+                is Result.Success -> {
+                    _state.update { state -> state.copy(displayState = DisplayState.Success) }
+                }
+            }
+        }
     }
 }

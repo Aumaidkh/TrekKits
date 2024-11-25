@@ -13,13 +13,18 @@ fun DependencyHandlerScope.addCompose(project: Project){
     implementation("androidx-ui-tooling-preview",project)
     debugImplementation("androidx-ui-tooling",project)
     debugImplementation("androidx-ui-test-manifest",project)
-
     implementationPlatform("androidx-compose-bom",project)
+}
+
+fun DependencyHandlerScope.addCredentialsManager(project: Project){
+    implementation("androidx-credentialsManager",project)
+    implementation("androidx-credential-play-services-auth",project)
 }
 
 fun DependencyHandlerScope.addFirebase(project: Project){
     implementationPlatform("firebase-bom",project)
     implementation("firebase-auth",project)
+    implementation("play-services-auth",project)
 }
 
 fun DependencyHandlerScope.addNavigation(project: Project){

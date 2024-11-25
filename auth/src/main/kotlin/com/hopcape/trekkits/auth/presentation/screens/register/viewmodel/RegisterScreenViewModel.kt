@@ -1,115 +1,262 @@
 
 package com.hopcape.trekkits.auth.presentation.screens.register.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hopcape.common.domain.wrappers.UseCaseResult
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.base.presentation.BaseViewModel
+import com.hopcape.common.domain.wrappers.Result
+import com.hopcape.trekkits.auth.AuthError
+import com.hopcape.trekkits.auth.asUiText
 import com.hopcape.trekkits.auth.domain.models.User
 import com.hopcape.trekkits.auth.domain.usecase.RegisterUseCase
+import com.hopcape.trekkits.auth.domain.validation.EmailValidator
+import com.hopcape.trekkits.auth.domain.validation.FullNameValidator
+import com.hopcape.trekkits.auth.domain.validation.PasswordValidator
 import com.hopcape.trekkits.auth.presentation.SheetContent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterScreenViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
-) : ViewModel() {
-    private val _state = MutableStateFlow(RegisterScreenState())
-    val state: StateFlow<RegisterScreenState> = _state
-
-    private val _events = Channel<RegisterScreenEvents>()
-    val events get() = _events.receiveAsFlow()
-
-    fun onAction(action: RegisterScreenAction) {
+internal class RegisterScreenViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator,
+    private val nameValidator: FullNameValidator,
+) : BaseViewModel<RegisterScreenState, RegisterScreenAction, RegisterScreenEvents>(
+    initialState = RegisterScreenState()
+) {
+    override fun onAction(action: RegisterScreenAction) {
         when (action) {
-            is RegisterScreenAction.FirstNameChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(firstName = action.value, firstNameError = null)) }
-            }
-            is RegisterScreenAction.EmailChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(email = action.value.trim(), emailError = null)) }
-            }
-            is RegisterScreenAction.PasswordChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(password = action.value.trim(), passwordError = null)) }
-            }
+            is RegisterScreenAction.FirstNameChanged -> handleNameChange(
+                name = action.value
+            )
 
-            is RegisterScreenAction.ConfirmPasswordChanged -> {
-                _state.update { state -> state.copy(formState = state.formState.copy(confirmPassword = action.value.trim(), confirmPasswordError = null)) }
-            }
+            is RegisterScreenAction.EmailChanged -> handleEmailChange(
+                email = action.value
+            )
 
-            is RegisterScreenAction.Register -> {
-                register(
-                    user = User(
-                        name = _state.value.formState.firstName,
-                        email = _state.value.formState.email
-                    ),
-                    password = _state.value.formState.password,
-                    confirmPassword = _state.value.formState.confirmPassword
+            is RegisterScreenAction.PasswordChanged -> handlePasswordChange(
+                password = action.value
+            )
+
+            is RegisterScreenAction.ConfirmPasswordChanged -> handleConfirmPasswordChange(
+                password = action.value
+            )
+
+            is RegisterScreenAction.Register -> beginRegistration()
+
+            is RegisterScreenAction.OnBottomSheetButtonClick -> sendEvent(RegisterScreenEvents.DismissBottomSheet)
+
+            is RegisterScreenAction.Login -> sendEvent(RegisterScreenEvents.NavigateBack)
+
+            is RegisterScreenAction.SignInWithFacebook -> TODO()
+
+            is RegisterScreenAction.SignInWithGoogle -> TODO()
+        }
+    }
+
+    private fun handleNameChange(name: String) {
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    firstName = name.trim(),
+                    firstNameError = null
                 )
-            }
-
-            is RegisterScreenAction.OnBottomSheetButtonClick -> {
-                pushEvent(RegisterScreenEvents.DismissBottomSheet)
-            }
-            else -> {}
-
+            )
         }
     }
 
-    private fun pushEvent(event: RegisterScreenEvents){
-        viewModelScope.launch {
-            _events.send(event)
+    private fun handleEmailChange(email: String) {
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    email = email.trim(),
+                    emailError = null
+                )
+            )
         }
     }
 
-    private fun register(user: User,password: String,confirmPassword: String){
-        registerUseCase(
-            user = user,
-            password = password,
-            confirmPassword = confirmPassword
-        ).onEach { emission ->
-            when(emission){
-                is UseCaseResult.Error -> { _state.update { it.copy(displayState = RegisterScreenState.DisplayState.Initial) }; handleError(emission.error) }
-                is UseCaseResult.Loading -> { _state.update { it.copy(displayState = RegisterScreenState.DisplayState.Loading) } }
-                is UseCaseResult.Success -> {
-                    _state.update {
+    private fun handlePasswordChange(password: String) {
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    password = password.trim(),
+                    passwordError = null
+                )
+            )
+        }
+    }
+
+    private fun handleConfirmPasswordChange(password: String) {
+        _state.update {
+            it.copy(
+                formState = it.formState.copy(
+                    confirmPassword = password.trim(),
+                    confirmPasswordError = null
+                )
+            )
+        }
+    }
+
+    private fun isNameValid(name: String): Boolean {
+        return when (val result = nameValidator(name)) {
+            is Result.Error -> {
+                when (result.error) {
+                    FullNameValidator.NameError.EMPTY_NAME -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be empty")) }
+                    }
+
+                    FullNameValidator.NameError.BLANK_NAME -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be blank")) }
+                    }
+
+                    FullNameValidator.NameError.NAME_CONTAINS_DIGIT -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name can't contain a digit")) }
+                    }
+
+                    FullNameValidator.NameError.INVALID_NAME -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) }
+                    }
+                }
+                false
+            }
+
+            is Result.Success -> true
+        }
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        return when (val result = emailValidator(email)) {
+            is Result.Error -> {
+                when (result.error) {
+                    EmailValidator.EmailError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) }
+                        false
+                    }
+
+                    EmailValidator.EmailError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) }
+                        false
+                    }
+
+                    EmailValidator.EmailError.BLANK -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be blank")) }
+                        false
+                    }
+                }
+            }
+
+            is Result.Success -> return true
+        }
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        return when (val result = passwordValidator(password)) {
+            is Result.Error -> {
+                when (result.error) {
+                    PasswordValidator.PasswordError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) }
+                    }
+
+                    PasswordValidator.PasswordError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) }
+                    }
+                }
+                false
+            }
+
+            is Result.Success -> true
+        }
+    }
+
+    private fun isConfirmPasswordValid(password: String): Boolean {
+        return when (val result = passwordValidator(password)) {
+            is Result.Error -> {
+                when (result.error) {
+                    PasswordValidator.PasswordError.EMPTY -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Password cannot be empty")) }
+                    }
+
+                    PasswordValidator.PasswordError.INVALID -> {
+                        _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Invalid password")) }
+                    }
+                }
+                false
+            }
+
+            is Result.Success -> true
+        }
+    }
+
+    private fun passwordsMatch(
+        password: String,
+        confirmPassword: String
+    ): Boolean {
+        return (password == confirmPassword).also {
+            if (!it) {
+                _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Passwords don't match")) }
+            }
+        }
+    }
+
+    private fun shouldBeginRegistration(): Boolean {
+        return isNameValid(
+            name = _state.value.formState.firstName
+        ) && isEmailValid(
+            email = _state.value.formState.email
+        ) && isPasswordValid(
+            password = _state.value.formState.password
+        ) && isConfirmPasswordValid(
+            password = _state.value.formState.confirmPassword
+        ) && passwordsMatch(
+            password = _state.value.formState.password,
+            confirmPassword = _state.value.formState.confirmPassword
+        )
+    }
+
+    private fun beginRegistration() {
+        if (!shouldBeginRegistration()) {
+            return
+        }
+        register(
+            user = User(
+                name = _state.value.formState.firstName,
+                email = _state.value.formState.email
+            ),
+            password = _state.value.formState.password
+        )
+    }
+
+    private fun register(
+        user: User,
+        password: String
+    ) {
+        viewModelScope.withDispatcher {
+            registerUseCase(
+                user = user,
+                password = password
+            ).also { result ->
+                when (result) {
+                    is Result.Error -> handleError(result.error)
+                    is Result.Success -> _state.update {
                         it.copy(
                             displayState = RegisterScreenState.DisplayState.Success(
                                 sheetContent = SheetContent(
                                     title = "Success",
-                                    body = "You are one step away from registering into TrekKits. Please click on the email confirmation link sent to you on :${_state.value.formState.email}.",
-                                    button = "Dismiss"
+                                    body = "A confirmation email has been sent to ${user.email}. Please click the link in the email to confirm your account",
+                                    button = "Login"
                                 )
                             )
                         )
                     }
                 }
             }
-        }.launchIn(viewModelScope)
+        }
     }
 
-    private fun handleError(error: AuthDomainError){
-        when(error){
-            AuthDomainError.SOMETHING_WENT_WRONG -> { _state.update { state -> state.copy(displayState = RegisterScreenState.DisplayState.Error(message = "Something went wrong")) } }
-            AuthDomainError.INVALID_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Invalid email")) } }
-            AuthDomainError.INVALID_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid password")) } }
-            AuthDomainError.EMPTY_EMAIL -> { _state.update { state -> state.copy(formState = state.formState.copy(emailError = "Email cannot be empty")) } }
-            AuthDomainError.EMPTY_PASSWORD -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Password cannot be empty")) } }
-            AuthDomainError.INVALID_CREDENTIALS -> { _state.update { state -> state.copy(formState = state.formState.copy(passwordError = "Invalid username or password")) } }
-            AuthDomainError.PASSWORDS_DONT_MATCH -> { _state.update { state -> state.copy(formState = state.formState.copy(confirmPasswordError = "Passwords don't match")) } }
-            AuthDomainError.EMPTY_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name cannot be empty")) } }
-            AuthDomainError.NAME_CONTAINS_DIGIT -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Name can't contain a digit")) } }
-            AuthDomainError.INVALID_NAME -> { _state.update { state -> state.copy(formState = state.formState.copy(firstNameError = "Invalid name")) } }
-            else -> {}
-        }
-        _state.update { state -> state.copy(displayState = RegisterScreenState.DisplayState.Error(message = "Something went wrong")) }
+    private fun handleError(error: AuthError) {
+        sendEvent(RegisterScreenEvents.Error(error.asUiText()))
     }
+
 }

@@ -1,23 +1,21 @@
 package com.hopcape.trekkits.auth.domain.validation
 
-import com.hopcape.trekkits.auth.domain.errors.AuthDomainError
+import com.hopcape.common.domain.error.Error
+import com.hopcape.common.domain.wrappers.Result
 
 class PasswordValidator {
-    operator fun invoke(password: String): ValidationResult {
+    operator fun invoke(password: String): Result<Unit,PasswordError> {
         if (password.isEmpty()){
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_PASSWORD
-            )
+            return Result.Error(PasswordError.EMPTY)
         }
         if (password.isBlank()){
-            return ValidationResult(
-                isValid = false,
-                error = AuthDomainError.EMPTY_PASSWORD
-            )
+            return Result.Error(PasswordError.EMPTY)
         }
-        return ValidationResult(
-            isValid = true
-        )
+        return Result.Success(Unit)
+    }
+
+    enum class PasswordError: Error{
+        EMPTY,
+        INVALID
     }
 }
